@@ -22,6 +22,5 @@ public class PlayerScript : RigidBody {
     Vector3 offset = camera.GlobalTranslation - player.GlobalTranslation;
     origin.GlobalTranslation += offset.Inverse();
     camera.GlobalTranslation += offset;
-
   }
 }
