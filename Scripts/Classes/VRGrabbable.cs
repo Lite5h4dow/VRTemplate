@@ -14,7 +14,7 @@ namespace Gameplay {
     [Export]
     public Vector3 DualWeildRotationOffset { get; private set; }
     [Export]
-    public TrackerHand FavorHand { get; set; }
+    public ARVRPositionalTracker.TrackerHand? FavorHand { get; private set; }
 
 
     VRHand[] Hands { get; set; }
