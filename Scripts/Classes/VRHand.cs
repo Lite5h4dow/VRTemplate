@@ -14,7 +14,7 @@ namespace Gameplay {
 
     public Area GrabArea { get; private set; }
 
-    public PhysicsBody? HeldBody { get; set; }
+    public VRGrabbable? HeldBody { get; set; }
 
     public bool AButtonPressed { get; private set; }
     public bool AButtonTouched { get; private set; }
@@ -55,6 +55,8 @@ namespace Gameplay {
     public override void _Process(float delta) {
       TriggerAxis = Controller.GetJoystickAxis(2);
       GripAxis = Controller.GetJoystickAxis(4);
+      ThumbStickAxisX = Controller.GetJoystickAxis(0);
+      ThumbStickAxisY = Controller.GetJoystickAxis(1);
     }
 
     public void HandleControllerEnable() {
@@ -66,7 +68,7 @@ namespace Gameplay {
     }
 
     public PhysicsBody? GetGrabable() {
-      IEnumerable<PhysicsBody> bodies = GrabArea.GetOverlappingBodies().Cast<PhysicsBody>();
+      IEnumerable<VRGrabbable> bodies = GrabArea.GetOverlappingBodies().OfType<VRGrabbable>();
 
       PhysicsBody? closest = bodies.OrderBy((i) => {
         return Controller.GlobalTranslation.DistanceTo(i.GlobalTranslation);

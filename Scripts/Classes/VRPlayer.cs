@@ -39,6 +39,10 @@ namespace Gameplay {
       AlignCamera(camera, origin, this);
       AlignHeadCast(headCast, camera);
       AlignAndShapeCollision(collider, camera, headCast);
+
+      // HandProcesses
+      LeftHand._Process(delta);
+      RightHand._Process(delta);
     }
 
     // alligns the camera to the center of the player controller by offseting the playspace by the inverse amount the camera has moved. this keeps the camera and the player collision and controller in a predictable place relative to the game world 
