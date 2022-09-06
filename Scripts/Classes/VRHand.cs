@@ -8,6 +8,7 @@ using Godot;
 namespace Gameplay {
   public class VRHand : Node {
 
+    private float GrabThreshold;
     public ARVRController Controller { get; private set; }
 
     public Spatial TrackedHand { get; private set; }
@@ -38,11 +39,14 @@ namespace Gameplay {
     public bool TriggerTouched { get; private set; }
     public float TriggerAxis { get; private set; }
 
-    public VRHand(ARVRController controller, Spatial trackedHand, Area grabArea) {
+    public VRGrabbable? holding { get; private set; }
+
+    public VRHand(ARVRController controller, Spatial trackedHand, Area grabArea, float grabThreshold) {
       // set hand controllers
       Controller = controller;
       TrackedHand = trackedHand;
       GrabArea = grabArea;
+      GrabThreshold = grabThreshold;
 
       // set Signals
       Controller.Connect("button_pressed", this, "HandleInputPressedEvent");
@@ -57,6 +61,12 @@ namespace Gameplay {
       GripAxis = Controller.GetJoystickAxis(4);
       ThumbStickAxisX = Controller.GetJoystickAxis(0);
       ThumbStickAxisY = Controller.GetJoystickAxis(1);
+
+      if (GrabThresholdSurpassed() && holding == null) {
+        HandleGrab();
+      } else {
+        HandleRelease();
+      }
     }
 
     public void HandleControllerEnable() {
@@ -67,16 +77,38 @@ namespace Gameplay {
       TrackedHand.Visible = false;
     }
 
-    public PhysicsBody? GetGrabable() {
+
+    // get the closest grabbable.
+    public VRGrabbable? GetGrabable() {
       IEnumerable<VRGrabbable> bodies = GrabArea.GetOverlappingBodies().OfType<VRGrabbable>();
 
-      PhysicsBody? closest = bodies.OrderBy((i) => {
+      VRGrabbable? closest = bodies.OrderBy((i) => {
         return Controller.GlobalTranslation.DistanceTo(i.GlobalTranslation);
       }).FirstOrDefault();
 
       return closest;
     }
 
+
+    private bool GrabThresholdSurpassed() {
+      return GripAxis > GrabThreshold && GripPressed;
+    }
+
+    public void HandleRelease() {
+      if (holding == null) return;
+
+      holding.HandleRelease();
+      holding = null;
+    }
+
+    private void HandleGrab() {
+      VRGrabbable? grabbable = GetGrabable();
+      if (grabbable == null) return;
+      grabbable.HandleGrab(this);
+      holding = grabbable;
+    }
+
+    // Handle Input Events
     public void HandleInputPressedEvent(int id) {
       GD.Print(Controller.GetHand(), " pressed: ", id);
       switch (id) {

@@ -8,11 +8,26 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "EditorVCSInterface",
+"class": "GitAPI",
+"language": "NativeScript",
+"path": "res://addons/godot-git-plugin/git_api.gdns"
+} ]
+_global_script_class_icons={
+"GitAPI": ""
+}
+
 [application]
 
 config/name="VRTest"
 run/main_scene="res://Scenes/TestLevel.tscn"
 config/icon="res://icon.png"
+
+[editor]
+
+version_control_autoload_on_startup=true
+version_control_plugin_name="GitAPI"
 
 [editor_plugins]
 
@@ -20,7 +35,7 @@ enabled=PoolStringArray( "res://addons/godot-openxr/plugin.cfg" )
 
 [gdnative]
 
-singletons=[ "res://addons/godot-openxr/config/godot_openxr.gdnlib" ]
+singletons=[ "res://addons/godot-git-plugin/git_api.gdnlib", "res://addons/godot-openxr/config/godot_openxr.gdnlib" ]
 
 [gui]
 

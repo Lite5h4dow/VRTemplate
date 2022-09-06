@@ -6,9 +6,13 @@ namespace Gameplay {
     protected ARVROrigin origin { get; private set; }
     protected CollisionShape collider { get; private set; }
     protected RayCast headCast { get; private set; }
-
     protected VRHand LeftHand { get; private set; }
     protected VRHand RightHand { get; private set; }
+
+    [Export]
+    public float MaxHeight { get; private set; }
+    [Export]
+    public float GrabThreshold { get; private set; }
 
 
     // Called when the node enters the scene tree for the first time.
@@ -23,13 +27,15 @@ namespace Gameplay {
       LeftHand = new VRHand(
         GetNode<ARVRController>("FPController/LeftHandController"),
         GetNode<Spatial>("FPController/LeftHand"),
-        GetNode<Area>("FPController/RightHandController/GrabArea")
+        GetNode<Area>("FPController/RightHandController/GrabArea"),
+        GrabThreshold
       );
 
       RightHand = new VRHand(
         GetNode<ARVRController>("FPController/RightHandController"),
         GetNode<Spatial>("FPController/RightHand"),
-        GetNode<Area>("FPController/LeftHandController/GrabArea")
+        GetNode<Area>("FPController/LeftHandController/GrabArea"),
+        GrabThreshold
       );
     }
 
