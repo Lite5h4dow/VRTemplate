@@ -27,14 +27,16 @@ namespace Gameplay {
       LeftHand = new VRHand(
         GetNode<ARVRController>("FPController/LeftHandController"),
         GetNode<Spatial>("FPController/LeftHand"),
-        GetNode<Area>("FPController/RightHandController/GrabArea"),
+        GetNode<Area>("LeftGrabArea"),
+        GetNode<Spatial>("LeftMountPoint"),
         GrabThreshold
       );
 
       RightHand = new VRHand(
         GetNode<ARVRController>("FPController/RightHandController"),
         GetNode<Spatial>("FPController/RightHand"),
-        GetNode<Area>("FPController/LeftHandController/GrabArea"),
+        GetNode<Area>("RightGrabArea"),
+        GetNode<Spatial>("RightMountPoint"),
         GrabThreshold
       );
     }

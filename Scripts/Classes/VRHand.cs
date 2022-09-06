@@ -15,6 +15,8 @@ namespace Gameplay {
 
     public Area GrabArea { get; private set; }
 
+    public Spatial MountPoint { get; private set; }
+
     public VRGrabbable? HeldBody { get; set; }
 
     public bool AButtonPressed { get; private set; }
@@ -41,12 +43,22 @@ namespace Gameplay {
 
     public VRGrabbable? holding { get; private set; }
 
-    public VRHand(ARVRController controller, Spatial trackedHand, Area grabArea, float grabThreshold) {
+    private Vector3 LastPosition;
+    public Vector3 LinearVelocity { get; private set; }
+
+    private Basis LastBasis;
+    public Vector3 AngularVelocity { get; private set; }
+
+    public VRHand(ARVRController controller, Spatial trackedHand, Area grabArea, Spatial mountPoint, float grabThreshold) {
       // set hand controllers
       Controller = controller;
       TrackedHand = trackedHand;
       GrabArea = grabArea;
+      MountPoint = mountPoint;
       GrabThreshold = grabThreshold;
+
+      LastBasis = Controller.GlobalTransform.basis;
+      LastPosition = Controller.GlobalTranslation;
 
       // set Signals
       Controller.Connect("button_pressed", this, "HandleInputPressedEvent");
@@ -64,9 +76,27 @@ namespace Gameplay {
 
       if (GrabThresholdSurpassed() && holding == null) {
         HandleGrab();
-      } else {
+      }
+
+      if (!GrabThresholdSurpassed() && holding != null) {
         HandleRelease();
       }
+
+      CalculateLinearVelocity(delta);
+      CalculateAngularVelocity(delta);
+    }
+
+    private void CalculateLinearVelocity(float delta) {
+      LinearVelocity = (Controller.GlobalTranslation - LastPosition) / delta;
+      LastPosition = Controller.GlobalTranslation;
+    }
+
+    private void CalculateAngularVelocity(float delta) {
+      Quat RelativeQuat = (Controller.GlobalTransform.basis.RotationQuat() - LastBasis.RotationQuat()) / delta;
+      LastBasis = Controller.GlobalTransform.basis;
+
+      Quat outQuat = MathHelper.QuaternionToAxisAngle(RelativeQuat);
+      AngularVelocity = new Vector3(outQuat.x, outQuat.y, outQuat.z);
     }
 
     public void HandleControllerEnable() {
@@ -80,9 +110,12 @@ namespace Gameplay {
 
     // get the closest grabbable.
     public VRGrabbable? GetGrabable() {
-      IEnumerable<VRGrabbable> bodies = GrabArea.GetOverlappingBodies().OfType<VRGrabbable>();
+      GD.Print("finding bodies");
+      var bodies = GrabArea.GetOverlappingBodies();
+      if (bodies.Count > 0) GD.Print(bodies);
+      IEnumerable<VRGrabbable> grabbables = bodies.OfType<VRGrabbable>();
 
-      VRGrabbable? closest = bodies.OrderBy((i) => {
+      VRGrabbable? closest = grabbables.OrderBy((i) => {
         return Controller.GlobalTranslation.DistanceTo(i.GlobalTranslation);
       }).FirstOrDefault();
 
@@ -91,13 +124,12 @@ namespace Gameplay {
 
 
     private bool GrabThresholdSurpassed() {
-      return GripAxis > GrabThreshold && GripPressed;
+      return (GripAxis > GrabThreshold) && GripPressed;
     }
 
     public void HandleRelease() {
       if (holding == null) return;
-
-      holding.HandleRelease();
+      holding.HandleRelease(LinearVelocity, AngularVelocity);
       holding = null;
     }
 

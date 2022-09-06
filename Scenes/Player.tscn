@@ -31,24 +31,26 @@ shape = SubResource( 3 )
 [node name="FPController" parent="." instance=ExtResource( 2 )]
 
 [node name="LeftHandController" parent="FPController" index="2"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 visible = true
 hide_for_no_tracking_confidence = true
 
-[node name="GrabArea" type="Area" parent="FPController/LeftHandController" index="0"]
+[node name="GrabTransform" type="RemoteTransform" parent="FPController/LeftHandController" index="0"]
+remote_path = NodePath("../../../LeftGrabArea")
 
-[node name="GrabCollision" type="CollisionShape" parent="FPController/LeftHandController/GrabArea"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0150079, -0.035, 0.05 )
-shape = SubResource( 4 )
+[node name="MountTransform" type="RemoteTransform" parent="FPController/LeftHandController" index="1"]
+remote_path = NodePath("../../../LeftMountPoint")
 
 [node name="RightHandController" parent="FPController" index="3"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 visible = true
 hide_for_no_tracking_confidence = true
 
-[node name="GrabArea" type="Area" parent="FPController/RightHandController" index="0"]
+[node name="GrabTransform" type="RemoteTransform" parent="FPController/RightHandController" index="0"]
+remote_path = NodePath("../../../RightGrabArea")
 
-[node name="GrabCollision" type="CollisionShape" parent="FPController/RightHandController/GrabArea"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.015, -0.035, 0.050196 )
-shape = SubResource( 5 )
+[node name="MountTransform" type="RemoteTransform" parent="FPController/RightHandController" index="1"]
+remote_path = NodePath("../../../RightMountPoint")
 
 [node name="LeftHand" parent="FPController" instance=ExtResource( 1 )]
 motion_range = 1
@@ -62,5 +64,26 @@ enabled = true
 cast_to = Vector3( 0, -2, 0 )
 collision_mask = 3
 debug_shape_thickness = 5
+
+[node name="LeftGrabArea" type="Area" parent="."]
+collision_layer = 4
+collision_mask = 4
+gravity = 0.0
+
+[node name="GrabCollision" type="CollisionShape" parent="LeftGrabArea"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0150079, -0.035, 0.05 )
+shape = SubResource( 4 )
+
+[node name="RightGrabArea" type="Area" parent="."]
+collision_layer = 4
+collision_mask = 4
+
+[node name="GrabCollision" type="CollisionShape" parent="RightGrabArea"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.015, -0.035, 0.050196 )
+shape = SubResource( 5 )
+
+[node name="LeftMountPoint" type="Spatial" parent="."]
+
+[node name="RightMountPoint" type="Spatial" parent="."]
 
 [editable path="FPController"]
