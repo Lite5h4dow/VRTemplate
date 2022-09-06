@@ -16,16 +16,13 @@ namespace Gameplay {
     // handle relative position and parenting when grabbed
     public void HandleGrab(VRHand hand) {
       // if (Hand != null) Hand.HandleRelease();
-      if (Hand == null) {
-        GetParent().RemoveChild(this);
-        hand.Controller.AddChild(this);
-        Translation = GrabOffset;
-        Rotation = RotationOffset;
-        Hand = hand;
-        IsGrabbed = true;
-      } else {
-
-      }
+      if (Hand != null) return;
+      GetParent().RemoveChild(this);
+      hand.Controller.AddChild(this);
+      Translation = GrabOffset;
+      Rotation = RotationOffset;
+      Hand = hand;
+      IsGrabbed = true;
     }
 
 
